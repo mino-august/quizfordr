@@ -61,6 +61,8 @@ function addQuestion() {
     
     <select class="question-type-select" onchange="toggleQuestionType(this)" data-field="type">
       <option value="multiple">객관식 (4지선다)</option>
+      <option value="ox">OX 퀴즈</option>
+      <option value="text">주관식</option>
       <option value="slider">슬라이더 (숫자 맞추기)</option>
     </select>
     
@@ -83,7 +85,29 @@ function addQuestion() {
           <input type="text" class="option-input" placeholder="보기 4" data-option="3">
         </div>
       </div>
-      <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">✓ 정답인 보기를 선택하세요</p>
+      <p style="font-size: 11px; color: #666; margin-top: 5px;">✓ 정답인 보기를 선택하세요</p>
+    </div>
+    
+    <div class="options-wrapper ox-options" data-type="ox" style="display: none;">
+      <div class="ox-select-container">
+        <label class="ox-option">
+          <input type="radio" name="ox-correct-${questionCount}" class="ox-radio" value="O" checked>
+          <span class="ox-label ox-o">⭕ O</span>
+        </label>
+        <label class="ox-option">
+          <input type="radio" name="ox-correct-${questionCount}" class="ox-radio" value="X">
+          <span class="ox-label ox-x">❌ X</span>
+        </label>
+      </div>
+      <p style="font-size: 11px; color: #666; margin-top: 5px;">✓ 정답을 선택하세요</p>
+    </div>
+    
+    <div class="options-wrapper text-options" data-type="text" style="display: none;">
+      <div class="form-group">
+        <label class="pixel-label" style="color: #333; text-shadow: none;">정답 (대소문자 구분 없음)</label>
+        <input type="text" class="question-input" data-field="textAnswer" placeholder="정답을 입력하세요">
+      </div>
+      <p style="font-size: 11px; color: #666; margin-top: 5px;">💡 참가자가 입력한 답과 비교합니다</p>
     </div>
     
     <div class="options-wrapper slider-options" data-type="slider" style="display: none;">
@@ -131,14 +155,30 @@ function deleteQuestion(btn) {
 function toggleQuestionType(select) {
   const card = select.closest('.question-card');
   const multipleOptions = card.querySelector('[data-type="multiple"]');
+  const oxOptions = card.querySelector('[data-type="ox"]');
+  const textOptions = card.querySelector('[data-type="text"]');
   const sliderOptions = card.querySelector('[data-type="slider"]');
   
-  if (select.value === 'slider') {
-    multipleOptions.style.display = 'none';
-    sliderOptions.style.display = 'block';
-  } else {
-    multipleOptions.style.display = 'block';
-    sliderOptions.style.display = 'none';
+  // 모든 옵션 숨기기
+  multipleOptions.style.display = 'none';
+  oxOptions.style.display = 'none';
+  textOptions.style.display = 'none';
+  sliderOptions.style.display = 'none';
+  
+  // 선택된 유형만 표시
+  switch (select.value) {
+    case 'multiple':
+      multipleOptions.style.display = 'block';
+      break;
+    case 'ox':
+      oxOptions.style.display = 'block';
+      break;
+    case 'text':
+      textOptions.style.display = 'block';
+      break;
+    case 'slider':
+      sliderOptions.style.display = 'block';
+      break;
   }
 }
 
@@ -191,7 +231,18 @@ function collectQuizData() {
       
       questionData.options = options;
       questionData.correctAnswer = parseInt(card.querySelector('.option-radio:checked').value);
-    } else {
+    } else if (type === 'ox') {
+      questionData.options = ['O', 'X'];
+      questionData.correctAnswer = card.querySelector('.ox-radio:checked').value;
+    } else if (type === 'text') {
+      const textAnswer = card.querySelector('[data-field="textAnswer"]').value.trim();
+      if (!textAnswer) {
+        showToast('주관식 정답을 입력해주세요!', '⚠️');
+        return null;
+      }
+      questionData.options = null;
+      questionData.correctAnswer = textAnswer;
+    } else if (type === 'slider') {
       const min = parseInt(card.querySelector('[data-field="min"]').value);
       const max = parseInt(card.querySelector('[data-field="max"]').value);
       const answer = parseInt(card.querySelector('[data-field="sliderAnswer"]').value);
@@ -225,12 +276,44 @@ function createRoom() {
       isHost = true;
       
       document.getElementById('room-code-display').textContent = response.roomCode;
+      
+      // QR 코드 생성 (오류 발생해도 계속 진행)
+      try {
+        generateQRCode(response.roomCode);
+      } catch (e) {
+        console.error('QR 코드 생성 오류:', e);
+      }
+      
       showScreen('host-lobby');
       showToast('방이 생성되었습니다!', '🎉');
     } else {
       showToast('방 생성에 실패했습니다.', '❌');
     }
   });
+}
+
+// ===== QR 코드 생성 =====
+function generateQRCode(roomCode) {
+  const qrContainer = document.getElementById('qr-code-box');
+  qrContainer.innerHTML = ''; // 기존 QR 코드 제거
+  
+  // 참가 URL 생성 (현재 호스트 주소 + 방 코드)
+  const joinUrl = `${window.location.origin}?room=${roomCode}`;
+  
+  // QR 코드 생성 (qrcodejs 라이브러리 사용)
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(qrContainer, {
+      text: joinUrl,
+      width: 150,
+      height: 150,
+      colorDark: '#1e1b4b',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } else {
+    // QRCode 라이브러리가 로드되지 않은 경우
+    qrContainer.innerHTML = `<p style="color: #666; font-size: 11px; padding: 20px;">QR: ${roomCode}</p>`;
+  }
 }
 
 // ===== 방 참가 =====
@@ -318,6 +401,32 @@ function submitSliderAnswer() {
   showToast('답변이 제출되었습니다!', '✅');
 }
 
+// ===== 주관식 답변 제출 =====
+function submitTextAnswer() {
+  if (hasAnswered || !currentQuestion) return;
+  
+  const input = document.getElementById('text-answer-input');
+  const answer = input.value.trim();
+  
+  if (!answer) {
+    showToast('답변을 입력해주세요!', '⚠️');
+    return;
+  }
+  
+  hasAnswered = true;
+  input.disabled = true;
+  document.querySelector('.submit-text-btn').disabled = true;
+  
+  socket.emit('submit-answer', {
+    roomCode: currentRoomCode,
+    questionIndex: currentQuestion.index,
+    answer: answer,
+    timeRemaining
+  });
+  
+  showToast('답변이 제출되었습니다!', '✅');
+}
+
 // ===== 타이머 시작 =====
 function startTimer(duration) {
   timeRemaining = duration;
@@ -363,7 +472,34 @@ function displayQuestion(questionData) {
       btn.onclick = () => submitAnswer(index);
       answersContainer.appendChild(btn);
     });
-  } else {
+  } else if (questionData.type === 'ox') {
+    // OX 퀴즈
+    const oxContainer = document.createElement('div');
+    oxContainer.className = 'ox-answer-container';
+    oxContainer.innerHTML = `
+      <button class="answer-btn ox-btn ox-o-btn" onclick="submitAnswer('O')">⭕ O</button>
+      <button class="answer-btn ox-btn ox-x-btn" onclick="submitAnswer('X')">❌ X</button>
+    `;
+    answersContainer.appendChild(oxContainer);
+  } else if (questionData.type === 'text') {
+    // 주관식
+    const textContainer = document.createElement('div');
+    textContainer.className = 'text-answer-container';
+    textContainer.innerHTML = `
+      <input type="text" class="text-answer-input" id="text-answer-input" placeholder="정답을 입력하세요" autocomplete="off">
+      <button class="submit-text-btn retro-btn" onclick="submitTextAnswer()">제출하기</button>
+    `;
+    answersContainer.appendChild(textContainer);
+    
+    // 엔터키로 제출
+    setTimeout(() => {
+      const input = document.getElementById('text-answer-input');
+      input.focus();
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitTextAnswer();
+      });
+    }, 100);
+  } else if (questionData.type === 'slider') {
     // 슬라이더 타입
     const sliderContainer = document.createElement('div');
     sliderContainer.className = 'slider-container';
@@ -416,6 +552,8 @@ function displayAnswer(data) {
   // 정답 표시
   if (currentQuestion.type === 'multiple') {
     correctAnswerEl.textContent = currentQuestion.options[data.correctAnswer];
+  } else if (currentQuestion.type === 'ox') {
+    correctAnswerEl.textContent = data.correctAnswer === 'O' ? '⭕ O' : '❌ X';
   } else {
     correctAnswerEl.textContent = data.correctAnswer;
   }
@@ -565,6 +703,20 @@ document.addEventListener('DOMContentLoaded', () => {
       joinRoom();
     }
   });
+  
+  // URL 파라미터에서 방 코드 확인 (QR 코드로 접속 시)
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomCodeFromUrl = urlParams.get('room');
+  
+  if (roomCodeFromUrl) {
+    // 방 코드가 URL에 있으면 자동으로 참가 화면으로 이동
+    document.getElementById('room-code-input').value = roomCodeFromUrl.toUpperCase();
+    showScreen('join-room');
+    showToast('방 코드가 자동 입력되었습니다!', '📱');
+    
+    // URL에서 파라미터 제거 (히스토리 정리)
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
   
   console.log('🎮 슈퍼 퀴즈 브라더스 로딩 완료!');
 });

@@ -7,19 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="game-container">
-    <!-- 배경 장식 -->
-    <div class="cloud cloud-1"></div>
-    <div class="cloud cloud-2"></div>
-    <div class="cloud cloud-3"></div>
-    <div class="brick brick-1"></div>
-    <div class="brick brick-2"></div>
-    <div class="pipe pipe-left"></div>
-    <div class="pipe pipe-right"></div>
-    <div class="ground"></div>
     
     <!-- 메인 메뉴 -->
     <div id="main-menu" class="screen active">
@@ -52,7 +46,7 @@
     <!-- 호스트 설정 화면 -->
     <div id="host-setup" class="screen">
       <button class="back-btn" onclick="showScreen('main-menu')">◀ 뒤로</button>
-      <h2 class="screen-title">📝 퀴즈 만들기</h2>
+      <h2 class="screen-title">📝 퀴즈 생성하기</h2>
       
       <div class="quiz-builder">
         <div class="form-group">
@@ -64,15 +58,17 @@
           <!-- 문제들이 여기에 추가됨 -->
         </div>
         
-        <button class="retro-btn add-question-btn" onclick="addQuestion()">
-          <span class="btn-icon">➕</span>
-          <span class="btn-text">문제 추가</span>
-        </button>
-        
-        <button class="retro-btn start-btn" onclick="createRoom()" id="create-room-btn">
-          <span class="btn-icon">🚀</span>
-          <span class="btn-text">방 만들기</span>
-        </button>
+        <div class="quiz-builder-buttons">
+          <button class="retro-btn add-question-btn" onclick="addQuestion()">
+            <span class="btn-icon">➕</span>
+            <span class="btn-text">문제 추가</span>
+          </button>
+          
+          <button class="retro-btn start-btn" onclick="createRoom()" id="create-room-btn">
+            <span class="btn-icon">🚀</span>
+            <span class="btn-text">방 만들기</span>
+          </button>
+        </div>
       </div>
     </div>
     
@@ -84,6 +80,12 @@
         <p class="code-label">참가 코드</p>
         <div class="code-box" id="room-code-display">------</div>
         <p class="code-hint">친구들에게 이 코드를 공유하세요!</p>
+      </div>
+      
+      <div class="qr-code-display">
+        <p class="code-label">QR 코드로 참가</p>
+        <div class="qr-code-box" id="qr-code-box"></div>
+        <p class="code-hint">스마트폰으로 스캔하세요!</p>
       </div>
       
       <div class="participants-panel">
@@ -220,6 +222,11 @@
     <span class="toast-icon">ℹ️</span>
     <span class="toast-message" id="toast-message">메시지</span>
   </div>
+  
+  <!-- 푸터 -->
+  <footer class="footer">
+    <p class="footer-text">© 2025 우아한형제들 Developer Relations. All rights reserved.</p>
+  </footer>
   
   <script src="/socket.io/socket.io.js"></script>
   <script src="app.js"></script>
