@@ -1094,9 +1094,10 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 3px dashed rgba(255, 255, 255, 0.3);
+  align-items: center;
+  margin-top: 40px;
+  padding: 25px 0;
+  grid-column: 1 / -1;
 }
 
 .show-answer-btn {
