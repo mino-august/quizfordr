@@ -157,10 +157,27 @@ io.on('connection', (socket) => {
     });
   });
 
+  // 호스트가 정답 확인 버튼 클릭
+  socket.on('show-answer', ({ roomCode }) => {
+    const room = rooms.get(roomCode);
+    if (!room || socket.id !== room.hostId) return;
+    
+    showAnswer(roomCode, room.currentQuestion);
+  });
+
   // 정답 공개 및 점수 계산
   function showAnswer(roomCode, questionIndex) {
     const room = rooms.get(roomCode);
     if (!room) return;
+    
+    // 이미 정답이 공개된 경우 스킵
+    if (room.answeredQuestions && room.answeredQuestions.has(questionIndex)) {
+      return;
+    }
+    
+    // 정답 공개 표시
+    if (!room.answeredQuestions) room.answeredQuestions = new Set();
+    room.answeredQuestions.add(questionIndex);
     
     const question = room.quiz.questions[questionIndex];
     const questionAnswers = room.answers.get(questionIndex);
