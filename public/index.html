@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍄 레트로 퀴즈 - 슈퍼 퀴즈 브라더스!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <!-- 배경 장식 -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="brick brick-1"></div>
+    <div class="brick brick-2"></div>
+    <div class="pipe pipe-left"></div>
+    <div class="pipe pipe-right"></div>
+    <div class="ground"></div>
+    
+    <!-- 메인 메뉴 -->
+    <div id="main-menu" class="screen active">
+      <div class="title-container">
+        <h1 class="game-title">
+          <span class="title-super">SUPER</span>
+          <span class="title-quiz">QUIZ</span>
+          <span class="title-bros">BROS!</span>
+        </h1>
+        <p class="subtitle">🎮 실시간 멀티플레이어 퀴즈 게임</p>
+      </div>
+      
+      <div class="menu-buttons">
+        <button class="retro-btn host-btn" onclick="showScreen('host-setup')">
+          <span class="btn-icon">👑</span>
+          <span class="btn-text">호스트로 시작</span>
+        </button>
+        <button class="retro-btn join-btn" onclick="showScreen('join-room')">
+          <span class="btn-icon">🎯</span>
+          <span class="btn-text">게임 참가하기</span>
+        </button>
+      </div>
+      
+      <div class="coin-counter">
+        <span class="coin">🪙</span>
+        <span class="coin-text">INSERT COIN</span>
+      </div>
+    </div>
+    
+    <!-- 호스트 설정 화면 -->
+    <div id="host-setup" class="screen">
+      <button class="back-btn" onclick="showScreen('main-menu')">◀ 뒤로</button>
+      <h2 class="screen-title">📝 퀴즈 만들기</h2>
+      
+      <div class="quiz-builder">
+        <div class="form-group">
+          <label class="pixel-label">퀴즈 제목</label>
+          <input type="text" id="quiz-title" class="pixel-input" placeholder="예: 게임 상식 퀴즈">
+        </div>
+        
+        <div class="questions-container" id="questions-container">
+          <!-- 문제들이 여기에 추가됨 -->
+        </div>
+        
+        <button class="retro-btn add-question-btn" onclick="addQuestion()">
+          <span class="btn-icon">➕</span>
+          <span class="btn-text">문제 추가</span>
+        </button>
+        
+        <button class="retro-btn start-btn" onclick="createRoom()" id="create-room-btn">
+          <span class="btn-icon">🚀</span>
+          <span class="btn-text">방 만들기</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 호스트 대기실 -->
+    <div id="host-lobby" class="screen">
+      <h2 class="screen-title">🏠 대기실</h2>
+      
+      <div class="room-code-display">
+        <p class="code-label">참가 코드</p>
+        <div class="code-box" id="room-code-display">------</div>
+        <p class="code-hint">친구들에게 이 코드를 공유하세요!</p>
+      </div>
+      
+      <div class="participants-panel">
+        <div class="participants-header">
+          <span class="mushroom">🍄</span>
+          <span>참가자: <span id="participant-count">0</span>명</span>
+        </div>
+        <div class="participants-list" id="participants-list">
+          <p class="waiting-text">참가자를 기다리는 중...</p>
+        </div>
+      </div>
+      
+      <button class="retro-btn start-game-btn" onclick="startGame()" id="start-game-btn" disabled>
+        <span class="btn-icon">🎮</span>
+        <span class="btn-text">게임 시작!</span>
+      </button>
+    </div>
+    
+    <!-- 참가자 입장 화면 -->
+    <div id="join-room" class="screen">
+      <button class="back-btn" onclick="showScreen('main-menu')">◀ 뒤로</button>
+      <h2 class="screen-title">🎯 게임 참가</h2>
+      
+      <div class="join-form">
+        <div class="form-group">
+          <label class="pixel-label">닉네임</label>
+          <input type="text" id="nickname" class="pixel-input" placeholder="닉네임을 입력하세요" maxlength="10">
+        </div>
+        
+        <div class="form-group">
+          <label class="pixel-label">참가 코드</label>
+          <input type="text" id="room-code-input" class="pixel-input code-input" placeholder="ABC123" maxlength="6">
+        </div>
+        
+        <button class="retro-btn join-game-btn" onclick="joinRoom()">
+          <span class="btn-icon">🚪</span>
+          <span class="btn-text">입장하기</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 참가자 대기 화면 -->
+    <div id="player-lobby" class="screen">
+      <div class="player-waiting">
+        <div class="player-avatar">🎮</div>
+        <h2 class="player-name" id="player-nickname">플레이어</h2>
+        <p class="waiting-message">게임 시작을 기다리는 중...</p>
+        <div class="loading-blocks">
+          <span class="block block-q">?</span>
+          <span class="block block-q">?</span>
+          <span class="block block-q">?</span>
+        </div>
+        <p class="quiz-info">퀴즈: <span id="quiz-title-display">-</span></p>
+        <p class="participants-info">현재 참가자: <span id="player-count-display">0</span>명</p>
+      </div>
+    </div>
+    
+    <!-- 게임 플레이 화면 -->
+    <div id="game-screen" class="screen">
+      <div class="game-header">
+        <div class="question-counter">
+          <span id="current-q">1</span> / <span id="total-q">10</span>
+        </div>
+        <div class="timer-container">
+          <div class="timer-bar" id="timer-bar"></div>
+          <span class="timer-text" id="timer-text">20</span>
+        </div>
+      </div>
+      
+      <div class="question-box" id="question-box">
+        <p class="question-text" id="question-text">문제가 여기에 표시됩니다</p>
+      </div>
+      
+      <div class="answers-container" id="answers-container">
+        <!-- 답변 옵션들이 여기에 표시됨 -->
+      </div>
+      
+      <div class="answer-status" id="answer-status">
+        <p>답변 현황: <span id="answered-count">0</span> / <span id="total-players">0</span></p>
+      </div>
+    </div>
+    
+    <!-- 정답 공개 화면 -->
+    <div id="answer-screen" class="screen">
+      <h2 class="answer-title" id="answer-result-title">정답!</h2>
+      <div class="correct-answer-box">
+        <p class="correct-label">정답은</p>
+        <p class="correct-answer" id="correct-answer">정답</p>
+      </div>
+      
+      <div class="leaderboard-mini" id="leaderboard-mini">
+        <!-- 순위표 -->
+      </div>
+    </div>
+    
+    <!-- 최종 결과 화면 -->
+    <div id="results-screen" class="screen">
+      <h2 class="results-title">🏆 최종 결과</h2>
+      
+      <div class="podium">
+        <div class="podium-place second" id="place-2">
+          <div class="player-medal">🥈</div>
+          <div class="player-name">-</div>
+          <div class="player-score">0</div>
+          <div class="podium-block">2</div>
+        </div>
+        <div class="podium-place first" id="place-1">
+          <div class="player-medal">🥇</div>
+          <div class="player-name">-</div>
+          <div class="player-score">0</div>
+          <div class="podium-block">1</div>
+        </div>
+        <div class="podium-place third" id="place-3">
+          <div class="player-medal">🥉</div>
+          <div class="player-name">-</div>
+          <div class="player-score">0</div>
+          <div class="podium-block">3</div>
+        </div>
+      </div>
+      
+      <div class="full-results" id="full-results">
+        <!-- 전체 순위 -->
+      </div>
+      
+      <button class="retro-btn play-again-btn" onclick="location.reload()">
+        <span class="btn-icon">🔄</span>
+        <span class="btn-text">다시 플레이</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- 알림 토스트 -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">ℹ️</span>
+    <span class="toast-message" id="toast-message">메시지</span>
+  </div>
+  
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
