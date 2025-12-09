@@ -364,7 +364,12 @@ function submitAnswer(answerIndex) {
   // 선택한 버튼 표시
   const buttons = document.querySelectorAll('.answer-btn');
   buttons.forEach((btn, index) => {
-    if (index === answerIndex) {
+    // OX 퀴즈의 경우 버튼 텍스트로 비교
+    const isSelected = (currentQuestion.type === 'ox') 
+      ? btn.textContent.includes(answerIndex)
+      : index === answerIndex;
+    
+    if (isSelected) {
       btn.classList.add('selected');
     }
     btn.disabled = true;
@@ -522,8 +527,23 @@ function displayQuestion(questionData) {
   // 답변 현황 초기화
   document.getElementById('answered-count').textContent = '0';
   
+  // 호스트용 정답 확인 버튼 추가
+  if (isHost) {
+    const hostControls = document.createElement('div');
+    hostControls.className = 'host-controls';
+    hostControls.innerHTML = `
+      <button class="show-answer-btn retro-btn" onclick="requestShowAnswer()">🔍 정답 확인하기</button>
+    `;
+    answersContainer.appendChild(hostControls);
+  }
+  
   showScreen('game-screen');
   startTimer(questionData.timeLimit);
+}
+
+// ===== 호스트가 정답 확인 요청 =====
+function requestShowAnswer() {
+  socket.emit('show-answer', { roomCode: currentRoomCode });
 }
 
 // ===== 정답 표시 =====
