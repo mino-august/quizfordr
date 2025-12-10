@@ -738,6 +738,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.history.replaceState({}, document.title, window.location.pathname);
   }
   
-  console.log('🎮 슈퍼 퀴즈 브라더스 로딩 완료!');
+  console.log('🎮 우아한퀴즈타임 로딩 완료!');
 });
 
