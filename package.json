@@ -1,7 +1,7 @@
 {
-  "name": "retro-quiz-platform",
+  "name": "woowa-quiz-time",
   "version": "1.0.0",
-  "description": "슈퍼마리오 스타일의 레트로 퀴즈 플랫폼",
+  "description": "WOOWA QUIZ TIME",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
