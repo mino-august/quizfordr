@@ -1378,42 +1378,153 @@ body {
 
 /* ===== 반응형 ===== */
 @media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .screen {
+    padding: 15px;
+    padding-bottom: 100px;
+  }
+  
   .game-title .title-quiz {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
   
   .game-title .title-super,
   .game-title .title-bros {
-    font-size: 1.5rem;
-  }
-  
-  .retro-btn {
-    min-width: 240px;
-    padding: 15px 30px;
-    font-size: 0.8rem;
-  }
-  
-  .code-box {
-    font-size: 1.8rem;
-    padding: 15px 25px;
-    letter-spacing: 5px;
-  }
-  
-  .question-text {
     font-size: 1.2rem;
   }
   
+  .title-container {
+    margin-bottom: 20px;
+  }
+  
+  .coin-text {
+    font-size: 0.8rem;
+  }
+  
+  .retro-btn {
+    min-width: 200px;
+    padding: 12px 20px;
+    font-size: 0.7rem;
+  }
+  
+  .code-box {
+    font-size: 1.5rem;
+    padding: 12px 20px;
+    letter-spacing: 4px;
+  }
+  
+  .question-text {
+    font-size: 1rem;
+    padding: 15px;
+  }
+  
   .answer-btn {
-    padding: 20px 15px;
+    padding: 15px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .timer-container {
+    padding: 10px 15px;
+  }
+  
+  .timer-text {
+    font-size: 1.5rem;
+  }
+  
+  .input-group {
+    max-width: 100%;
+  }
+  
+  .pixel-input {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .quiz-builder {
+    width: 100%;
+    padding: 15px;
+  }
+  
+  .question-card {
+    padding: 12px;
+  }
+  
+  .host-controls {
+    margin-top: 20px;
+    padding: 15px 0;
+  }
+  
+  .show-answer-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .slider-container {
+    padding: 15px;
+  }
+  
+  .slider-value {
+    font-size: 1.5rem;
+  }
+  
+  .leaderboard-container,
+  .results-container {
+    padding: 15px;
+  }
+  
+  .leaderboard-item,
+  .result-item {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .qr-container {
+    padding: 15px;
+  }
+  
+  .qr-container canvas {
+    max-width: 150px !important;
+    max-height: 150px !important;
+  }
+  
+  .footer {
+    padding: 10px 15px;
+  }
+  
+  .footer-text {
+    font-size: 11px;
+  }
+}
+
+/* 더 작은 화면 (iPhone SE 등) */
+@media (max-width: 380px) {
+  .game-title .title-quiz {
+    font-size: 1.5rem;
+  }
+  
+  .game-title .title-super,
+  .game-title .title-bros {
     font-size: 1rem;
   }
   
-  .pipe {
-    display: none;
+  .retro-btn {
+    min-width: 180px;
+    padding: 10px 15px;
+    font-size: 0.65rem;
   }
   
-  .brick {
-    display: none;
+  .code-box {
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    letter-spacing: 3px;
+  }
+  
+  .answer-btn {
+    padding: 12px 10px;
+    font-size: 0.8rem;
   }
 }
 
